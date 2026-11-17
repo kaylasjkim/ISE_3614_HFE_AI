@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Applicant | Human-AI Collaboration</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="index.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <h1>Job Applicant</h1>
+      <p>Human-AI Collaboration System</p>
+    </div>
+    <button id="theme-toggle" type="button"
+            aria-label="Switch to dark mode">
+      Dark Mode
+    </button>
+  </header>
+
+  <div class="app-layout">
+    <nav class="sidebar" aria-label="Agent navigation">
+      <h2>Workspace</h2>
+      <button class="nav-button active" data-tab="home"
+              aria-current="page">Dashboard</button>
+      <button class="nav-button" data-tab="agent1">
+        Agent 1: Job Search
+      </button>
+      <button class="nav-button" data-tab="agent2">
+        Agent 2: Resume Tailor
+      </button>
+      <button class="nav-button" data-tab="agent3">
+        Agent 3: Personal Assistant
+      </button>
+      <button class="nav-button" data-tab="agent4">
+        Agent 4: Interview Coach
+      </button>
+      <button class="nav-button" data-tab="feedback">
+        Customer Service / Feedback
+      </button>
+    </nav>
+
+    <main id="main-content">
+      <div class="prototype-notice" role="note">
+        Prototype Mode: All jobs, applications, interviews,
+        messages, and AI responses are simulated.
+        No external actions will occur.
+      </div>
+
+      <section id="home" class="tab active">
+        <h2>Welcome to Your Job Search Workspace</h2>
+        <p>
+          Manage your job search with four specialized AI
+          assistant prototypes. Select an agent to begin.
+        </p>
+
+        <div class="card-grid">
+          <article class="card">
+            <h3>Agent 1: Job Search</h3>
+            <p>Discover opportunities and review skill matches.</p>
+            <button class="primary-button open-agent"
+                    data-target="agent1">Open Agent 1</button>
+          </article>
+
+          <article class="card">
+            <h3>Agent 2: Resume Tailor</h3>
+            <p>Create job-specific resume and cover letter drafts.</p>
+            <button class="primary-button open-agent"
+                    data-target="agent2">Open Agent 2</button>
+          </article>
+
+          <article class="card">
+            <h3>Agent 3: Personal Assistant</h3>
+            <p>Schedule interviews and prepare follow-up messages.</p>
+            <button class="primary-button open-agent"
+                    data-target="agent3">Open Agent 3</button>
+          </article>
+
+          <article class="card">
+            <h3>Agent 4: Interview Coach</h3>
+            <p>Practice interview questions and review feedback.</p>
+            <button class="primary-button open-agent"
+                    data-target="agent4">Open Agent 4</button>
+          </article>
+        </div>
+      </section>
+
+      <!-- AGENT 1 -->
+      <section id="agent1" class="tab" hidden>
+        <h2>Agent 1: Job Search</h2>
+        <p>Enter your skills to find simulated job matches.</p>
+        <div class="card">
+          <form id="job-form" novalidate>
+            <label for="skills">Your Skills</label>
+            <input id="skills" type="text" required
+                   placeholder="python, research, usability">
+            <p class="hint">Separate skills with commas.</p>
+
+            <label for="job-email">Email Address</label>
+            <input id="job-email" type="email" required
+                   placeholder="name@example.com"
+                   autocomplete="email">
+            <p class="error" id="job-email-error"
+               role="alert"></p>
+
+            <label for="threshold">Minimum Skill Match</label>
+            <select id="threshold">
+              <option value="50">50%</option>
+              <option value="75">75%</option>
+              <option value="100">100%</option>
+              <option value="0">All Matches</option>
+            </select>
+
+            <button class="primary-button" type="submit">
+              Search Jobs
+            </button>
+          </form>
+        </div>
+
+        <p class="status" id="job-status"
+           role="status" aria-live="polite">Ready</p>
+        <div id="job-results" class="card-grid"></div>
+        <h3>Simulated Application History</h3>
+        <div id="application-history" class="card"></div>
+      </section>
+
+      <!-- AGENT 2 -->
+      <section id="agent2" class="tab" hidden>
+        <h2>Agent 2: Resume and Cover Letter Tailor</h2>
+        <p>
+          Generate tailored drafts using only the information
+          you provide. Review all content before approval.
+        </p>
+        <div class="card">
+          <form id="resume-form" novalidate>
+            <label for="applicant-name">Full Name</label>
+            <input id="applicant-name" required
+                   placeholder="Your name">
+
+            <label for="education">Education</label>
+            <input id="education" required
+                   placeholder="Degree or educational background">
+
+            <label for="resume-skills">Skills</label>
+            <input id="resume-skills" required
+                   placeholder="research, python, usability">
+
+            <label for="experience">Relevant Experience</label>
+            <textarea id="experience" required rows="4"
+                      placeholder="Describe actual experience"></textarea>
+
+            <label for="achievements">Achievements</label>
+            <textarea id="achievements" rows="3"
+                      placeholder="Optional accomplishments"></textarea>
+
+            <label for="target-job">Target Position</label>
+            <select id="target-job">
+              <option value="0">Human Factors Engineering Intern</option>
+              <option value="1">UX Research Intern</option>
+              <option value="2">Software Engineering Intern</option>
+              <option value="3">Human-AI Interaction Research Assistant</option>
+            </select>
+
+            <button class="primary-button" type="submit">
+              Generate Drafts
+            </button>
+          </form>
+        </div>
+
+        <p class="status" id="resume-status"
+           role="status" aria-live="polite">Ready</p>
+        <div id="resume-output" class="card" hidden>
+          <h3>Resume Draft</h3>
+          <pre id="resume-text"></pre>
+          <h3>Cover Letter Draft</h3>
+          <pre id="letter-text"></pre>
+          <button id="approve-documents" class="primary-button">
+            Approve Documents
+          </button>
+          <button id="download-documents" disabled>
+            Download Approved Documents
+          </button>
+        </div>
+      </section>
+
+      <!-- AGENT 3 -->
+      <section id="agent3" class="tab" hidden>
+        <h2>Agent 3: Personal Assistant</h2>
+        <p>
+          Review simulated interview invitations and
+          approve calendar or follow-up actions.
+        </p>
+        <div class="card">
+          <h3>Simulated Calendar Connection</h3>
+          <label for="calendar-service">Calendar Provider</label>
+          <select id="calendar-service">
+            <option>Google Calendar</option>
+            <option>Outlook Calendar</option>
+            <option>Apple Calendar</option>
+          </select>
+          <button id="connect-calendar" class="primary-button">
+            Connect (Simulation)
+          </button>
+        </div>
+
+        <h3>Interview Invitations</h3>
+        <div id="invitation-list" class="card-grid"></div>
+
+        <p class="status" id="calendar-status"
+           role="status" aria-live="polite">Not connected</p>
+
+        <h3>Scheduled Interviews</h3>
+        <div id="scheduled-list" class="card"></div>
+
+        <div class="card">
+          <h3>Post-Interview Follow-Up</h3>
+          <label for="followup-company">Scheduled Interview</label>
+          <select id="followup-company"></select>
+
+          <label for="followup-type">Message Type</label>
+          <select id="followup-type">
+            <option value="thanks">Thank-you email</option>
+            <option value="status">Application status inquiry</option>
+            <option value="linkedin">LinkedIn connection</option>
+          </select>
+
+          <button id="generate-followup" class="primary-button">
+            Generate Message
+          </button>
+
+          <div id="followup-preview" hidden>
+            <h4>Message Preview</h4>
+            <pre id="followup-text"></pre>
+            <button id="approve-followup" class="primary-button">
+              Approve Simulated Send
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- AGENT 4 -->
+      <section id="agent4" class="tab" hidden>
+        <h2>Agent 4: Interview Coach</h2>
+        <p>
+          Practice representative interview questions and
+          receive simulated coaching feedback.
+        </p>
+        <div class="card">
+          <label for="coach-job">Select Position</label>
+          <select id="coach-job">
+            <option value="0">Human Factors Engineering Intern</option>
+            <option value="1">UX Research Intern</option>
+            <option value="2">Software Engineering Intern</option>
+            <option value="3">Human-AI Interaction Research Assistant</option>
+          </select>
+
+          <button id="start-practice" class="primary-button">
+            Start Practice
+          </button>
+        </div>
+
+        <div id="practice-area" class="card" hidden>
+          <p id="question-progress"></p>
+          <h3 id="interview-question"></h3>
+
+          <label for="interview-answer">Your Response</label>
+          <textarea id="interview-answer" rows="6"
+                    placeholder="Enter your response"></textarea>
+          <p class="error" id="answer-error" role="alert"></p>
+
+          <button id="submit-answer" class="primary-button">
+            Submit Answer
+          </button>
+          <div id="coaching-feedback" role="status"></div>
+          <button id="next-question" hidden>
+            Next Question
+          </button>
+        </div>
+        <p class="status" id="coach-status"
+           role="status" aria-live="polite">Ready</p>
+      </section>
+
+      <!-- CUSTOMER SERVICE -->
+      <section id="feedback" class="tab" hidden>
+        <h2>Customer Service / Feedback</h2>
+        <p>
+          Report a usability issue or provide feedback
+          about your experience with the prototype.
+        </p>
+        <div class="card">
+          <form id="feedback-form" novalidate>
+            <label for="feedback-name">Name</label>
+            <input id="feedback-name" required>
+
+            <label for="feedback-email">Email Address</label>
+            <input id="feedback-email" type="email" required
+                   placeholder="name@example.com">
+            <p class="error" id="feedback-email-error"
+               role="alert"></p>
+
+            <label for="feedback-category">Category</label>
+            <select id="feedback-category">
+              <option>Usability Issue</option>
+              <option>System Error</option>
+              <option>Feature Suggestion</option>
+              <option>General Feedback</option>
+            </select>
+
+            <label for="feedback-message">Your Message</label>
+            <textarea id="feedback-message" rows="5"
+                      required minlength="10"
+                      placeholder="Describe your experience"></textarea>
+
+            <button class="primary-button" type="submit">
+              Submit Feedback
+            </button>
+          </form>
+          <p class="status" id="feedback-status"
+             role="status" aria-live="polite"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>
+      Job Applicant Human-AI Collaboration System |
+      Human Factors Engineering Prototype
+    </p>
+    <p>No real external actions are performed.</p>
+  </footer>
+
+  <dialog id="confirm-dialog" aria-labelledby="dialog-title">
+    <h2 id="dialog-title">Confirm Action</h2>
+    <p id="dialog-message"></p>
+    <div class="dialog-actions">
+      <button id="dialog-cancel">Cancel</button>
+      <button id="dialog-confirm" class="primary-button">
+        Confirm
+      </button>
+    </div>
+  </dialog>
+</body>
+</html>
