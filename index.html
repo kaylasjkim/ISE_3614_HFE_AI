@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -10,7 +9,7 @@
 </head>
 <body>
   <header class="site-header">
-    <div><h1>Job Applicant</h1><p>Human–AI Collaboration System</p></div>
+    <div class="brand-lockup"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/branding/logo_dark_mode.png"><img id="site-logo" src="assets/branding/logo_light_mode.png" alt="Job Applicant logo" class="site-logo"></picture><div><h1>Job Applicant</h1><p>Human–AI Collaboration System</p></div></div>
     <button id="theme-toggle" type="button">Dark Mode</button>
   </header>
   <div class="app-layout">
@@ -35,10 +34,10 @@
           <article class="card"><h3>Agent 4: Interview Coach</h3><p>Choose your practice length and receive coaching feedback.</p><button class="primary-button open-agent" data-target="agent4">Open Agent 4</button></article>
         </div>
       </section>
-      <section class="tab" id="agent1" hidden>
+      <section class="tab" id="agent1" hidden><picture class="agent-art"><source srcset="assets/branding/agent_1_job_search_dark_mode.png" media="(prefers-color-scheme: dark)"><img src="assets/branding/agent_1_job_search.png" alt="Agent 1 illustration"></picture>
         <h2>Agent 1: Job Search</h2><p>Match your skills with example openings.</p>
         <form id="job-form" class="card" novalidate>
-          <label for="skills">Your Skills</label><input id="skills" required placeholder="python, usability, research"><p class="hint">Separate skills with commas.</p>
+          <label for="skills-menu">Your Skills (check all that apply)</label><details id="skills-menu" class="skills-menu"><summary>Select skills</summary><div id="skill-checkboxes" class="skill-checkboxes"><label><input type="checkbox" value="python"> Python</label><label><input type="checkbox" value="usability"> Usability</label><label><input type="checkbox" value="research"> Research</label><label><input type="checkbox" value="interviews"> Interviews</label><label><input type="checkbox" value="javascript"> JavaScript</label><label><input type="checkbox" value="git"> Git</label><label><input type="checkbox" value="human-ai"> Human-AI</label><label><input type="checkbox" value="ergonomics"> Ergonomics</label><label><input type="checkbox" value="data analysis"> Data Analysis</label></div></details><label for="other-skills">Other skills (optional)</label><input id="other-skills" placeholder="e.g., SQL, teamwork"><p class="hint">⚠️ Warning: must separate skills with commas when entering multiple Other skills.</p>
           <label for="job-email">Email Address</label><input id="job-email" type="email" required placeholder="name@example.com"><p id="job-email-error" class="error" role="alert"></p>
           <label for="threshold">Minimum Skill Match</label><select id="threshold"><option value="50">50%</option><option value="75">75%</option><option value="100">100%</option><option value="0">All Matches</option></select>
           <button type="submit" class="primary-button">Search Jobs</button>
@@ -46,7 +45,7 @@
         <p class="status" id="job-status" role="status">Ready to search.</p><div id="job-results" class="card-grid"></div>
         <h3>Simulated Application History</h3><div id="application-history" class="card"></div>
       </section>
-      <section class="tab" id="agent2" hidden>
+      <section class="tab" id="agent2" hidden><picture class="agent-art"><source srcset="assets/branding/agent_2_tailor_dark_mode.png" media="(prefers-color-scheme: dark)"><img src="assets/branding/agent_2_tailor.png" alt="Agent 2 illustration"></picture>
         <h2>Agent 2: Resume and Cover Letter Tailor</h2><p>Enter only real experience and certifications. Review the drafts before approving.</p>
         <form id="resume-form" class="card" novalidate>
           <label for="applicant-name">Full Name</label><input id="applicant-name" required placeholder="Alex Morgan">
@@ -68,20 +67,20 @@
           </div>
         </div>
       </section>
-      <section class="tab" id="agent3" hidden>
+      <section class="tab" id="agent3" hidden><picture class="agent-art"><source srcset="assets/branding/agent_3_personal_assistant_dark_mode.png" media="(prefers-color-scheme: dark)"><img src="assets/branding/agent_3_personal_assistant.png" alt="Agent 3 illustration"></picture>
         <h2>Agent 3: Personal Assistant</h2><p>Review simulated interview invitations and approve actions.</p>
-        <div class="card"><h3>Calendar Connection</h3><label for="calendar-service">Calendar Provider</label><select id="calendar-service"><option>Google Calendar</option><option>Outlook Calendar</option><option>Apple Calendar</option></select><button id="connect-calendar" type="button" class="primary-button">Connect (Simulation)</button></div>
+        <div class="card"><h3>Calendar Connection</h3><label for="calendar-service">Calendar Provider</label><select id="calendar-service"><option>Google Calendar</option><option>Outlook Calendar</option><option>Apple Calendar</option></select><button id="connect-calendar" type="button" class="primary-button">Connect</button></div>
         <h3>Interview Invitations</h3><div id="invitation-list" class="card-grid"></div>
         <p id="calendar-status" class="status" role="status">Connect a simulated calendar to begin.</p>
         <h3>Scheduled Interviews</h3><div id="scheduled-list" class="card"></div>
         <div class="card"><h3>Post-Interview Follow-Up</h3><label for="followup-company">Scheduled Interview</label><select id="followup-company"></select><label for="followup-type">Message Type</label><select id="followup-type"><option value="thanks">Thank-you email</option><option value="status">Application status inquiry</option><option value="linkedin">LinkedIn connection</option></select><button id="generate-followup" type="button" class="primary-button">Generate Message</button><div id="followup-preview" hidden><h4>Message Preview</h4><pre id="followup-text"></pre><button id="approve-followup" type="button" class="primary-button">Approve Simulated Send</button></div></div>
       </section>
-      <section class="tab" id="agent4" hidden>
-        <h2>Agent 4: Interview Coach</h2><p>Choose how many practice questions you want to answer.</p>
+      <section class="tab" id="agent4" hidden><picture class="agent-art"><source srcset="assets/branding/agent_4_interview_coach_dark_mode.png" media="(prefers-color-scheme: dark)"><img src="assets/branding/agent_4_interview_coach.png" alt="Agent 4 illustration"></picture>
+        <h2>Agent 4: Interview Coach</h2><p>Choose between 1 and 10 practice questions. Save your answers to resume later.</p>
         <div class="card"><label for="coach-job">Select Position</label><select id="coach-job"><option value="0">Human Factors Engineering Intern — SpaceX</option><option value="1">UX Research Intern — PFS</option><option value="2">Software Engineering Intern — CodePath</option><option value="3">Human-AI Interaction Research Assistant — Virginia Tech DIT: ARC</option></select>
-          <label for="question-count">Number of Practice Questions</label><select id="question-count"><option value="1">1 question</option><option value="2" selected>2 questions</option><option value="3">3 questions</option><option value="4">4 questions</option><option value="5">5 questions</option></select>
+          <label for="question-count">Number of Practice Questions</label><select id="question-count"><option value="1">1 question</option><option value="2" selected>2 questions</option><option value="3">3 questions</option><option value="4">4 questions</option><option value="5">5 questions</option><option value="6">6 questions</option><option value="7">7 questions</option><option value="8">8 questions</option><option value="9">9 questions</option><option value="10">10 questions</option></select>
           <button id="start-practice" type="button" class="primary-button">Start Practice</button></div>
-        <div id="practice-area" class="card" hidden><p id="question-progress"></p><h3 id="interview-question"></h3><label for="interview-answer">Your Response</label><textarea id="interview-answer" rows="6" placeholder="Describe your approach or example"></textarea><p id="answer-error" class="error" role="alert"></p><button id="submit-answer" type="button" class="primary-button">Submit Answer</button><div id="coaching-feedback" role="status"></div><button id="next-question" type="button" hidden>Next Question</button></div>
+        <div id="practice-area" class="card" hidden><p id="question-progress"></p><h3 id="interview-question"></h3><label for="interview-answer">Your Response</label><textarea id="interview-answer" rows="6" placeholder="Describe your approach or example"></textarea><p id="answer-error" class="error" role="alert"></p><button id="submit-answer" type="button" class="primary-button">Submit Answer</button><div id="coaching-feedback" role="status"></div><button id="next-question" type="button" hidden>Next Question</button><div class="button-row"><button id="save-practice" type="button">Save Responses for Later</button><button id="abandon-practice" type="button">Exit / Abandon Practice</button></div></div><div id="saved-practice-controls" class="card" hidden><p>Saved interview practice found on this device.</p><button id="resume-practice" type="button" class="primary-button">Resume Saved Practice</button><button id="discard-saved-practice" type="button">Discard Saved Practice</button></div>
         <p id="coach-status" class="status" role="status">Ready to practice.</p>
       </section>
       <section class="tab" id="feedback" hidden>
@@ -91,6 +90,6 @@
     </main>
   </div>
   <footer class="site-footer">Human Factors Engineering Prototype — No real external actions are performed.</footer>
-  <dialog id="message-dialog" aria-labelledby="modal-title"><div id="modal-mark" class="modal-mark" aria-hidden="true"></div><h2 id="modal-title"></h2><p id="modal-message"></p><div class="dialog-actions"><button id="modal-cancel" type="button">Cancel</button><button id="modal-confirm" type="button" class="primary-button">Confirm</button></div></dialog>
+  <dialog id="message-dialog" aria-labelledby="modal-title"><div id="modal-mark" class="modal-mark" aria-hidden="true"></div><h2 id="modal-title"></h2><picture id="modal-error-art" class="modal-error-art" hidden><source srcset="assets/branding/error_dark_mode.png" media="(prefers-color-scheme: dark)"><img src="assets/branding/error.png" alt="Error illustration"></picture><p id="modal-message"></p><div class="dialog-actions"><button id="modal-cancel" type="button">Cancel</button><button id="modal-confirm" type="button" class="primary-button">Confirm</button></div></dialog>
 </body>
 </html>
