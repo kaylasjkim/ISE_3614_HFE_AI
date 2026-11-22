@@ -1,851 +1,102 @@
-
-// ======================================================
-// JOB APPLICANT - HUMAN-AI COLLABORATION SYSTEM
-// Interactive frontend prototype
-// ======================================================
-
-// No API key or external service is required.
-// All agent actions below are simulations.
-
-const $ = (id) => document.getElementById(id);
-
+// ISE 3614 Human-AI Collaboration Website — frontend-only simulation.
+// No Python files, accounts, APIs, or external services are accessed.
+const $ = id => document.getElementById(id);
 const jobs = [
-  {
-    title: "Human Factors Engineering Intern",
-    company: "AeroTech",
-    skills: ["python", "usability", "research"],
-    focus: "usability testing and human-centered design",
-    questions: [
-      {
-        text: "How would you evaluate interface usability?",
-        keywords: ["users", "testing", "tasks", "feedback"]
-      },
-      {
-        text: "Describe a time you improved a design.",
-        keywords: ["situation", "action", "result", "feedback"]
-      }
-    ]
-  },
-  {
-    title: "UX Research Intern",
-    company: "DesignWorks",
-    skills: ["research", "interviews", "usability"],
-    focus: "user interviews and interface evaluation",
-    questions: [
-      {
-        text: "How would you conduct a user interview?",
-        keywords: ["questions", "participants", "listening"]
-      },
-      {
-        text: "Describe a challenging research project.",
-        keywords: ["situation", "action", "result"]
-      }
-    ]
-  },
-  {
-    title: "Software Engineering Intern",
-    company: "CodeLabs",
-    skills: ["python", "javascript", "git"],
-    focus: "software development and testing",
-    questions: [
-      {
-        text: "How do you debug a software problem?",
-        keywords: ["reproduce", "test", "debug", "solution"]
-      },
-      {
-        text: "Describe a collaborative coding project.",
-        keywords: ["team", "communication", "result"]
-      }
-    ]
-  },
-  {
-    title: "Human-AI Interaction Research Assistant",
-    company: "Research Institute",
-    skills: ["python", "research", "human-ai"],
-    focus: "human-AI collaboration research",
-    questions: [
-      {
-        text: "How would you evaluate trust in an AI system?",
-        keywords: ["trust", "users", "evaluation", "feedback"]
-      },
-      {
-        text: "Describe learning an unfamiliar technology.",
-        keywords: ["situation", "action", "learning", "result"]
-      }
-    ]
-  }
+  {company:'SpaceX',title:'Human Factors Engineering Intern',skills:['python','usability','research'],focus:'usability testing and human-centered design'},
+  {company:'PFS',title:'UX Research Intern',skills:['research','interviews','usability'],focus:'user interviews and interface evaluation'},
+  {company:'CodePath',title:'Software Engineering Intern',skills:['python','javascript','git'],focus:'software development and testing'},
+  {company:'Virginia Tech Division of Information Technology: Advanced Research Computing (ARC)',title:'Human-AI Interaction Research Assistant',skills:['python','research','human-ai'],focus:'human-AI collaboration research'}
 ];
-
+const questionBank = [
+  [
+    {text:'How would you evaluate interface usability?',keywords:['users','testing','tasks','feedback']},
+    {text:'Describe a time you improved a design.',keywords:['situation','action','result','feedback']},
+    {text:'How would you identify an interface design problem?',keywords:['observe','users','problem','test']},
+    {text:'How would you measure human performance?',keywords:['accuracy','time','errors','users']},
+    {text:'How would you present usability findings?',keywords:['findings','evidence','recommendations','stakeholders']}
+  ],
+  [
+    {text:'How would you conduct a user interview?',keywords:['questions','participants','listening']},
+    {text:'Describe a challenging research project.',keywords:['situation','action','result']},
+    {text:'How would you recruit research participants?',keywords:['criteria','participants','recruit','consent']},
+    {text:'How do you synthesize interview results?',keywords:['themes','notes','patterns','insights']},
+    {text:'How would you evaluate a prototype?',keywords:['users','tasks','testing','feedback']}
+  ],
+  [
+    {text:'How do you debug a software problem?',keywords:['reproduce','test','debug','solution']},
+    {text:'Describe a collaborative coding project.',keywords:['team','communication','result']},
+    {text:'How do you use version control?',keywords:['git','commit','branch','review']},
+    {text:'How would you test a new feature?',keywords:['requirements','test','cases','bugs']},
+    {text:'How do you explain technical work to a nontechnical person?',keywords:['simple','example','feedback','audience']}
+  ],
+  [
+    {text:'How would you evaluate trust in an AI system?',keywords:['trust','users','evaluation','feedback']},
+    {text:'Describe learning an unfamiliar technology.',keywords:['situation','action','learning','result']},
+    {text:'How would you study human-AI collaboration?',keywords:['human','ai','tasks','evaluation']},
+    {text:'How would you identify AI system risks?',keywords:['errors','bias','users','mitigation']},
+    {text:'How should users oversee an AI recommendation?',keywords:['review','explanation','approve','control']}
+  ]
+];
 const invitations = [
-  {
-    id: 1, job: 0, date: "2026-12-01",
-    time: "10:00", duration: 60
-  },
-  {
-    id: 2, job: 1, date: "2026-12-02",
-    time: "14:00", duration: 45
-  },
-  {
-    id: 3, job: 3, date: "2026-12-01",
-    time: "10:30", duration: 60
-  }
+  {id:1,job:0,date:'2026-12-01',time:'10:00',duration:60},
+  {id:2,job:1,date:'2026-12-02',time:'14:00',duration:45},
+  {id:3,job:3,date:'2026-12-01',time:'10:30',duration:60}
 ];
-
-const app = {
-  applications: [],
-  calendarConnected: false,
-  scheduled: [],
-  documentsApproved: false,
-  resume: "",
-  letter: "",
-  followup: "",
-  questionIndex: 0,
-  practiceJob: null,
-  practiceScores: [],
-  feedback: []
-};
-
-// ------------------------------------------------------
-// SHARED UTILITIES
-// ------------------------------------------------------
-
-function status(id, message) {
-  $(id).textContent = message;
-}
-
-function createElement(tag, text, className = "") {
-  const element = document.createElement(tag);
-  element.textContent = text;
-  if (className) element.className = className;
-  return element;
-}
-
-function addButton(parent, label, action, primary = false) {
-  const button = createElement("button", label);
-  button.type = "button";
-  if (primary) button.className = "primary-button";
-  button.addEventListener("click", action);
-  parent.appendChild(button);
-  return button;
-}
-
-function validEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-}
-
-function validateEmail(inputId, errorId) {
-  const input = $(inputId);
-  const valid = validEmail(input.value);
-
-  input.setAttribute("aria-invalid", String(!valid));
-  $(errorId).textContent = valid
-    ? ""
-    : "Enter a valid email address, such as name@example.com.";
-
-  return valid;
-}
-
-function validateRequired(ids) {
-  let firstInvalid = null;
-
-  ids.forEach((id) => {
-    const field = $(id);
-    const invalid = !field.value.trim();
-
-    field.setAttribute("aria-invalid", String(invalid));
-
-    if (invalid && !firstInvalid) firstInvalid = field;
-  });
-
-  if (firstInvalid) firstInvalid.focus();
-  return !firstInvalid;
-}
-
-function confirmAction(message, callback) {
-  $("dialog-message").textContent = message;
-
-  const dialog = $("confirm-dialog");
-  dialog.showModal();
-
-  $("dialog-confirm").onclick = () => {
-    dialog.close();
-    callback();
-  };
-
-  $("dialog-cancel").onclick = () => dialog.close();
-}
-
-// ------------------------------------------------------
-// NAVIGATION
-// ------------------------------------------------------
-
-function showTab(tabId) {
-  document.querySelectorAll(".tab").forEach((tab) => {
-    const active = tab.id === tabId;
-    tab.hidden = !active;
-    tab.classList.toggle("active", active);
-  });
-
-  document.querySelectorAll(".nav-button").forEach((button) => {
-    const active = button.dataset.tab === tabId;
-    button.classList.toggle("active", active);
-
-    if (active) button.setAttribute("aria-current", "page");
-    else button.removeAttribute("aria-current");
-  });
-
-  const heading = $(tabId).querySelector("h2");
-  if (heading) {
-    heading.setAttribute("tabindex", "-1");
-    heading.focus({ preventScroll: true });
-  }
-}
-
-document.querySelectorAll(".nav-button").forEach((button) => {
-  button.addEventListener("click", () => {
-    showTab(button.dataset.tab);
-  });
-});
-
-document.querySelectorAll(".open-agent").forEach((button) => {
-  button.addEventListener("click", () => {
-    showTab(button.dataset.target);
-  });
-});
-
-// ------------------------------------------------------
-// DARK / LIGHT MODE
-// ------------------------------------------------------
-
-const themeButton = $("theme-toggle");
-
-function updateTheme(dark) {
-  document.body.classList.toggle("dark-mode", dark);
-  themeButton.textContent = dark ? "Light Mode" : "Dark Mode";
-  themeButton.setAttribute(
-    "aria-label",
-    dark ? "Switch to light mode" : "Switch to dark mode"
-  );
-}
-
-try {
-  updateTheme(localStorage.getItem("theme") === "dark");
-} catch {
-  updateTheme(false);
-}
-
-themeButton.addEventListener("click", () => {
-  const dark = !document.body.classList.contains("dark-mode");
-  updateTheme(dark);
-
-  try {
-    localStorage.setItem("theme", dark ? "dark" : "light");
-  } catch {
-    // Continue without persistent storage.
-  }
-});
-
-// ------------------------------------------------------
-// AGENT 1: JOB SEARCH
-// ------------------------------------------------------
-
-function renderApplicationHistory() {
-  const container = $("application-history");
-  container.replaceChildren();
-
-  if (!app.applications.length) {
-    container.textContent = "No simulated applications yet.";
-    return;
-  }
-
-  app.applications.forEach((record) => {
-    container.appendChild(createElement(
-      "p",
-      `${record.title} at ${record.company} — Simulated submission`
-    ));
-  });
-}
-
-$("job-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const skillsValid = validateRequired(["skills"]);
-  const emailValid = validateEmail("job-email", "job-email-error");
-
-  if (!skillsValid || !emailValid) {
-    status("job-status", "Error: Correct the highlighted fields.");
-    return;
-  }
-
-  status("job-status", "SEARCHING: Evaluating simulated job listings.");
-
-  const userSkills = $("skills").value.toLowerCase()
-    .split(",").map((skill) => skill.trim()).filter(Boolean);
-
-  const threshold = Number($("threshold").value);
-  const results = $("job-results");
-  results.replaceChildren();
-
-  let count = 0;
-
-  jobs.forEach((job, index) => {
-    const matched = job.skills.filter(
-      (skill) => userSkills.includes(skill)
-    );
-
-    const score = Math.round(
-      matched.length / job.skills.length * 100
-    );
-
-    if (score < threshold) return;
-    count++;
-
-    const card = createElement("article", "", "card");
-
-    card.appendChild(createElement("h3", job.title));
-    card.appendChild(createElement("p", job.company));
-    card.appendChild(createElement(
-      "p", `Skill match: ${score}%`
-    ));
-    card.appendChild(createElement(
-      "p", `Matched: ${matched.join(", ") || "None"}`
-    ));
-    card.appendChild(createElement(
-      "p",
-      `Not demonstrated: ${
-        job.skills.filter(s => !matched.includes(s)).join(", ")
-        || "None"
-      }`
-    ));
-
-    addButton(card, "Review and Apply", () => {
-      status("job-status", "AWAITING_HUMAN_APPROVAL");
-
-      confirmAction(
-        `Simulate an application to ${job.company} for ` +
-        `${job.title}? No real application will be sent.`,
-        () => {
-          if (app.applications.some(a => a.index === index)) {
-            status("job-status", "Application already recorded.");
-            return;
-          }
-
-          app.applications.push({
-            index, title: job.title, company: job.company
-          });
-
-          status(
-            "job-status",
-            "APPLICATION_RECORDED: Simulated submission complete."
-          );
-
-          renderApplicationHistory();
-        }
-      );
-    }, true);
-
-    results.appendChild(card);
-  });
-
-  status(
-    "job-status",
-    count
-      ? `RESULTS_AVAILABLE: ${count} matching jobs found.`
-      : "NO_RESULTS: Lower the threshold or update your skills."
-  );
-});
-
-$("job-email").addEventListener("input", () => {
-  if ($("job-email").value) {
-    validateEmail("job-email", "job-email-error");
-  }
-});
-
-renderApplicationHistory();
-
-// ------------------------------------------------------
-// AGENT 2: RESUME AND COVER LETTER TAILOR
-// ------------------------------------------------------
-
-$("resume-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  if (!validateRequired([
-    "applicant-name", "education", "resume-skills", "experience"
-  ])) {
-    status("resume-status", "Error: Complete required fields.");
-    return;
-  }
-
-  status("resume-status", "GENERATING_DRAFTS");
-
-  const job = jobs[Number($("target-job").value)];
-  const name = $("applicant-name").value.trim();
-  const education = $("education").value.trim();
-  const skills = $("resume-skills").value.trim();
-  const experience = $("experience").value.trim();
-  const achievements = $("achievements").value.trim();
-
-  const skillList = skills.split(",").map(s => s.trim());
-  const matched = job.skills.filter(s =>
-    skillList.some(u => u.toLowerCase() === s)
-  );
-
-  app.resume =
-`RESUME - TAILORED DRAFT
-
-${name}
-
-TARGET POSITION
-${job.title} | ${job.company}
-
-EDUCATION
-${education}
-
-SKILLS
-${skills}
-
-EXPERIENCE
-${experience}
-
-ACHIEVEMENTS
-${achievements || "Not provided"}
-
-MATCHED JOB SKILLS
-${matched.join(", ") || "None identified"}`;
-
-  app.letter =
-`Dear ${job.company} Hiring Team,
-
-I am interested in the ${job.title} position.
-
-My educational background is ${education}.
-
-My relevant experience includes:
-${experience}
-
-My listed skills include ${skills}.
-
-I am interested in the role's focus on ${job.focus}.
-
-Thank you for considering my application.
-
-Sincerely,
-${name}`;
-
-  $("resume-text").textContent = app.resume;
-  $("letter-text").textContent = app.letter;
-
-  $("resume-output").hidden = false;
-  $("download-documents").disabled = true;
-  app.documentsApproved = false;
-
-  status(
-    "resume-status",
-    "AWAITING_HUMAN_REVIEW: Verify all content before approval."
-  );
-});
-
-$("approve-documents").addEventListener("click", () => {
-  confirmAction(
-    "Have you reviewed both documents and verified that " +
-    "all information is accurate?",
-    () => {
-      app.documentsApproved = true;
-      $("download-documents").disabled = false;
-      status("resume-status", "APPROVED: Documents ready for export.");
-    }
-  );
-});
-
-function downloadText(filename, content) {
-  const blob = new Blob([content], {
-    type: "text/plain;charset=utf-8"
-  });
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-$("download-documents").addEventListener("click", () => {
-  if (!app.documentsApproved) return;
-
-  downloadText("tailored_resume.txt", app.resume);
-  downloadText("tailored_cover_letter.txt", app.letter);
-
-  status("resume-status", "EXPORTED: Download initiated.");
-});
-
-// ------------------------------------------------------
-// AGENT 3: PERSONAL ASSISTANT
-// ------------------------------------------------------
-
-$("connect-calendar").addEventListener("click", () => {
-  app.calendarConnected = true;
-
-  status(
-    "calendar-status",
-    "CONNECTED_SIMULATION: " +
-    $("calendar-service").value +
-    ". No real account was accessed."
-  );
-});
-
-function minutes(date, time) {
-  return new Date(`${date}T${time}:00`).getTime();
-}
-
-function hasConflict(invitation) {
-  const start = minutes(invitation.date, invitation.time);
-  const end = start + invitation.duration * 60000;
-
-  return app.scheduled.some((existing) => {
-    const otherStart = minutes(existing.date, existing.time);
-    const otherEnd = otherStart + existing.duration * 60000;
-
-    return start < otherEnd && end > otherStart;
-  });
-}
-
-function renderInvitations() {
-  const container = $("invitation-list");
-  container.replaceChildren();
-
-  invitations.forEach((invitation) => {
-    const job = jobs[invitation.job];
-    const card = createElement("article", "", "card");
-
-    card.appendChild(createElement("h3", job.company));
-    card.appendChild(createElement("p", job.title));
-    card.appendChild(createElement(
-      "p", `${invitation.date} at ${invitation.time}`
-    ));
-
-    const alreadyScheduled = app.scheduled.some(
-      i => i.id === invitation.id
-    );
-
-    const button = addButton(
-      card,
-      alreadyScheduled ? "Scheduled" : "Schedule Interview",
-      () => {
-        if (!app.calendarConnected) {
-          status(
-            "calendar-status",
-            "ACTION_REQUIRED: Connect a simulated calendar first."
-          );
-          return;
-        }
-
-        if (hasConflict(invitation)) {
-          status(
-            "calendar-status",
-            "CONFLICT_DETECTED: This interview overlaps " +
-            "with an existing simulated appointment."
-          );
-          return;
-        }
-
-        status("calendar-status", "AWAITING_HUMAN_APPROVAL");
-
-        confirmAction(
-          `Schedule ${job.company} on ${invitation.date} ` +
-          `at ${invitation.time}?`,
-          () => {
-            app.scheduled.push(invitation);
-            renderInvitations();
-            renderScheduled();
-
-            status(
-              "calendar-status",
-              "INTERVIEW_SCHEDULED: Simulated calendar updated."
-            );
-          }
-        );
-      },
-      true
-    );
-
-    button.disabled = alreadyScheduled;
-    container.appendChild(card);
-  });
-}
-
-function renderScheduled() {
-  const container = $("scheduled-list");
-  const select = $("followup-company");
-
-  container.replaceChildren();
-  select.replaceChildren();
-
-  if (!app.scheduled.length) {
-    container.textContent = "No interviews scheduled.";
-    select.appendChild(
-      new Option("No scheduled interviews", "")
-    );
-    return;
-  }
-
-  app.scheduled.forEach((invitation) => {
-    const job = jobs[invitation.job];
-
-    container.appendChild(createElement(
-      "p",
-      `${job.company} — ${invitation.date}, ${invitation.time}`
-    ));
-
-    select.appendChild(
-      new Option(`${job.company}: ${job.title}`, invitation.id)
-    );
-  });
-}
-
-$("generate-followup").addEventListener("click", () => {
-  const invitation = app.scheduled.find(
-    i => i.id === Number($("followup-company").value)
-  );
-
-  if (!invitation) {
-    status("calendar-status", "Schedule an interview first.");
-    return;
-  }
-
-  const job = jobs[invitation.job];
-  const type = $("followup-type").value;
-
-  if (type === "thanks") {
-    app.followup =
-`Dear ${job.company} Hiring Team,
-
-Thank you for discussing the ${job.title} position.
-I appreciated learning more about the opportunity.
-
-Best regards,
-[Applicant Name]`;
-  } else if (type === "status") {
-    app.followup =
-`Dear ${job.company} Hiring Team,
-
-I am following up regarding the ${job.title} position.
-I remain interested and would appreciate any updates.
-
-Best regards,
-[Applicant Name]`;
-  } else {
-    app.followup =
-`Hello,
-
-Thank you for discussing the ${job.title} opportunity
-at ${job.company}. I would be glad to stay connected.`;
-  }
-
-  $("followup-text").textContent = app.followup;
-  $("followup-preview").hidden = false;
-
-  status("calendar-status", "MESSAGE_REVIEW: Approval required.");
-});
-
-$("approve-followup").addEventListener("click", () => {
-  if (!app.followup) return;
-
-  confirmAction(
-    "Approve this simulated message? " +
-    "No real email or connection request will be sent.",
-    () => {
-      status(
-        "calendar-status",
-        "FOLLOWUP_RECORDED: Simulated message approved."
-      );
-      $("followup-preview").hidden = true;
-      app.followup = "";
-    }
-  );
-});
-
-renderInvitations();
-renderScheduled();
-
-// ------------------------------------------------------
-// AGENT 4: INTERVIEW COACH
-// ------------------------------------------------------
-
-function showQuestion() {
-  const questions = app.practiceJob.questions;
-  const question = questions[app.questionIndex];
-
-  $("question-progress").textContent =
-    `Question ${app.questionIndex + 1} of ${questions.length}`;
-
-  $("interview-question").textContent = question.text;
-  $("interview-answer").value = "";
-  $("interview-answer").removeAttribute("aria-invalid");
-  $("answer-error").textContent = "";
-  $("coaching-feedback").replaceChildren();
-
-  $("submit-answer").disabled = false;
-  $("next-question").hidden = true;
-}
-
-$("start-practice").addEventListener("click", () => {
-  app.practiceJob = jobs[Number($("coach-job").value)];
-  app.questionIndex = 0;
-  app.practiceScores = [];
-
-  $("practice-area").hidden = false;
-  showQuestion();
-
-  status("coach-status", "PRACTICE_SESSION: In progress.");
-});
-
-$("submit-answer").addEventListener("click", () => {
-  const answer = $("interview-answer").value.trim();
-
-  if (!answer) {
-    $("interview-answer").setAttribute("aria-invalid", "true");
-    $("answer-error").textContent =
-      "Enter a response before requesting feedback.";
-    return;
-  }
-
-  const question = app.practiceJob.questions[app.questionIndex];
-  const lowerAnswer = answer.toLowerCase();
-
-  const matched = question.keywords.filter(
-    keyword => lowerAnswer.includes(keyword)
-  );
-
-  const score = Math.round(
-    matched.length / question.keywords.length * 100
-  );
-
-  app.practiceScores.push(score);
-
-  const missing = question.keywords.filter(
-    keyword => !matched.includes(keyword)
-  );
-
-  const feedback = $("coaching-feedback");
-  feedback.replaceChildren();
-
-  feedback.appendChild(createElement(
-    "h4", "Coaching Feedback"
-  ));
-  feedback.appendChild(createElement(
-    "p", `Keyword coverage: ${score}%`
-  ));
-  feedback.appendChild(createElement(
-    "p", `Recognized concepts: ${matched.join(", ") || "None"}`
-  ));
-  feedback.appendChild(createElement(
-    "p", `Consider discussing: ${missing.join(", ") || "None"}`
-  ));
-  feedback.appendChild(createElement(
-    "p",
-    "This is a keyword-based estimate, not a validated " +
-    "measure of interview quality."
-  ));
-
-  $("submit-answer").disabled = true;
-  $("next-question").hidden = false;
-
-  const last = app.questionIndex ===
-    app.practiceJob.questions.length - 1;
-
-  $("next-question").textContent =
-    last ? "Finish Practice" : "Next Question";
-
-  status("coach-status", "FEEDBACK_AVAILABLE");
-});
-
-$("next-question").addEventListener("click", () => {
-  app.questionIndex++;
-
-  if (app.questionIndex < app.practiceJob.questions.length) {
-    showQuestion();
-    status("coach-status", "PRACTICE_SESSION: In progress.");
-    return;
-  }
-
-  const average = Math.round(
-    app.practiceScores.reduce((a, b) => a + b, 0) /
-    app.practiceScores.length
-  );
-
-  $("practice-area").hidden = true;
-
-  status(
-    "coach-status",
-    `SESSION_COMPLETE: Average keyword coverage ${average}%.`
-  );
-});
-
-// ------------------------------------------------------
-// CUSTOMER SERVICE / FEEDBACK
-// ------------------------------------------------------
-
-$("feedback-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  const requiredValid = validateRequired([
-    "feedback-name", "feedback-message"
-  ]);
-
-  const emailValid = validateEmail(
-    "feedback-email", "feedback-email-error"
-  );
-
-  const message = $("feedback-message").value.trim();
-
-  if (!requiredValid || !emailValid || message.length < 10) {
-    if (message.length < 10) {
-      $("feedback-message").setAttribute("aria-invalid", "true");
-    }
-
-    status(
-      "feedback-status",
-      "Error: Complete all fields and enter at least " +
-      "10 characters in your message."
-    );
-    return;
-  }
-
-  confirmAction(
-    "Record this feedback locally in the current session? " +
-    "It will not be sent to a customer service team.",
-    () => {
-      app.feedback.push({
-        name: $("feedback-name").value.trim(),
-        email: $("feedback-email").value.trim(),
-        category: $("feedback-category").value,
-        message
-      });
-
-      $("feedback-form").reset();
-
-      ["feedback-name", "feedback-email", "feedback-message"]
-        .forEach(id => $(id).removeAttribute("aria-invalid"));
-
-      $("feedback-email-error").textContent = "";
-
-      status(
-        "feedback-status",
-        "FEEDBACK_RECORDED: Thank you. " +
-        "Your feedback was saved for this session only."
-      );
-    }
-  );
-});
-
-$("feedback-email").addEventListener("input", () => {
-  if ($("feedback-email").value) {
-    validateEmail("feedback-email", "feedback-email-error");
-  }
-});
+const app={applications:[],calendarConnected:false,scheduled:[],resume:'',letter:'',approved:false,shareUrl:null,followup:'',practiceJob:0,practiceQuestions:[],questionIndex:0,scores:[],feedback:[]};
+const el=(tag,text='',className='')=>{const node=document.createElement(tag);node.textContent=text;if(className)node.className=className;return node;};
+const addButton=(parent,label,handler,primary=false)=>{const button=el('button',label,primary?'primary-button':'');button.type='button';button.addEventListener('click',handler);parent.appendChild(button);return button;};
+const setStatus=(id,message)=>{$(id).textContent=message;};
+function showTab(id){document.querySelectorAll('.tab').forEach(t=>t.hidden=t.id!==id);document.querySelectorAll('.nav-button').forEach(b=>{const active=b.dataset.tab===id;b.classList.toggle('active',active);if(active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});const h=$(id).querySelector('h2');if(h){h.tabIndex=-1;h.focus({preventScroll:true});}}
+document.querySelectorAll('.nav-button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+document.querySelectorAll('.open-agent').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.target)));
+const theme=$('theme-toggle');function setTheme(dark){document.body.classList.toggle('dark-mode',dark);theme.textContent=dark?'Light Mode':'Dark Mode';theme.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');}
+try{setTheme(localStorage.getItem('theme')==='dark');}catch{setTheme(false);}
+theme.addEventListener('click',()=>{const dark=!document.body.classList.contains('dark-mode');setTheme(dark);try{localStorage.setItem('theme',dark?'dark':'light');}catch{}});
+// Reusable accessible confirmation / success / error modal.
+const modal=$('message-dialog');let modalCallback=null;
+function showModal(type,title,message,onConfirm=null){modal.className=type+'-modal';$('modal-title').textContent=title;$('modal-message').textContent=message;$('modal-mark').textContent=type==='error'?'!':type==='success'?'✓':'?';modalCallback=onConfirm;$('modal-cancel').hidden=type!=='confirm';$('modal-confirm').textContent=type==='confirm'?'Confirm':'OK';if(!modal.open)modal.showModal();}
+$('modal-confirm').addEventListener('click',()=>{const cb=modalCallback;modalCallback=null;modal.close();if(cb)cb();});
+$('modal-cancel').addEventListener('click',()=>{modalCallback=null;modal.close();});
+modal.addEventListener('cancel',()=>{modalCallback=null;});
+const confirm=(message,callback)=>showModal('confirm','Please confirm',message,callback);
+const success=(title,message)=>showModal('success',title,message);
+const error=(title,message)=>showModal('error',title,message);
+function validEmail(value){return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());}
+function checkEmail(id,errorId){const field=$(id),valid=validEmail(field.value);field.setAttribute('aria-invalid',String(!valid));$(errorId).textContent=valid?'':'Enter a valid email address, such as name@example.com.';return valid;}
+function checkRequired(ids){let first=null;ids.forEach(id=>{const field=$(id),invalid=!field.value.trim();field.setAttribute('aria-invalid',String(invalid));if(invalid&&!first)first=field;});if(first)first.focus();return !first;}
+['job-email','feedback-email'].forEach(id=>$(id).addEventListener('input',()=>{if($(id).value)checkEmail(id,id+'-error');}));
+// AGENT 1
+function renderApplications(){const box=$('application-history');box.replaceChildren();if(!app.applications.length){box.textContent='No simulated applications yet.';return;}app.applications.forEach(a=>box.appendChild(el('p',`${a.title} at ${a.company} — Application received (simulation)`)));}
+$('job-form').addEventListener('submit',event=>{event.preventDefault();const skillsOK=checkRequired(['skills']),emailOK=checkEmail('job-email','job-email-error');if(!skillsOK||!emailOK){error('Check your information','Please enter skills and a correctly formatted email address.');return;}const skills=$('skills').value.toLowerCase().split(',').map(s=>s.trim()).filter(Boolean);const threshold=Number($('threshold').value),results=$('job-results');results.replaceChildren();let count=0;jobs.forEach((job,index)=>{const matched=job.skills.filter(s=>skills.includes(s)),score=Math.round(matched.length/job.skills.length*100);if(score<threshold)return;count++;const card=el('article','','card');card.append(el('h3',job.title),el('p',job.company),el('p',`Skill match: ${score}%`),el('p',`Matched: ${matched.join(', ')||'None'}`),el('p',`Not demonstrated: ${job.skills.filter(s=>!matched.includes(s)).join(', ')||'None'}`));addButton(card,'Review and Apply',()=>{if(app.applications.some(a=>a.index===index)){error('Already applied','You have already recorded an application for this position.');return;}confirm(`Submit a simulated application to ${job.company} for ${job.title}?`,()=>{app.applications.push({index,title:job.title,company:job.company});renderApplications();setStatus('job-status','Your simulated application was recorded.');success('Application received!',`Your simulated application for ${job.title} at ${job.company} has been recorded. No real application was sent.`);});},true);results.appendChild(card);});setStatus('job-status',count?`${count} matching job(s) found.`:'No matches. Try a lower threshold or different skills.');});renderApplications();
+// AGENT 2: dynamically add/remove structured experiences and certifications.
+let experienceId=0,certificationId=0;
+function field(parent,labelText,kind,placeholder='',required=false){const wrap=el('div');const label=el('label',labelText),input=document.createElement(kind==='textarea'?'textarea':'input');input.id=`field-${++experienceId}`;label.htmlFor=input.id;if(kind==='date')input.type='date';if(kind==='text')input.type='text';if(kind==='textarea')input.rows=3;input.placeholder=placeholder;input.required=required;wrap.append(label,input);parent.appendChild(wrap);return input;}
+function addExperience(){const box=el('div','','experience-entry'),header=el('div','','entry-header'),grid=el('div','','field-grid');header.appendChild(el('h4','Past Experience'));addButton(header,'Remove',()=>{box.remove();invalidateDraft();});const company=field(grid,'Company','text','Company name',true),position=field(grid,'Position','text','Position title',true),start=field(grid,'Start Date','date','',true),end=field(grid,'End Date (leave blank if current)','date');const wide=el('div','','wide');const responsibilities=field(wide,'Responsibilities','textarea','Describe what you did',true);grid.appendChild(wide);box.append(header,grid);$('experiences').appendChild(box);[company,position,start,end,responsibilities].forEach(f=>f.addEventListener('input',invalidateDraft));}
+function addCertification(){const box=el('div','','certification-entry'),header=el('div','','entry-header'),grid=el('div','','field-grid');header.appendChild(el('h4','Certification'));addButton(header,'Remove',()=>{box.remove();invalidateDraft();});const company=field(grid,'Issuing Company / Organization','text','Issuer',true),name=field(grid,'Certification Name','text','Credential title',true),issued=field(grid,'Issue Date','date','',true),expires=field(grid,'Expiration Date (optional)','date');box.append(header,grid);$('certifications').appendChild(box);[company,name,issued,expires].forEach(f=>f.addEventListener('input',invalidateDraft));}
+$('add-experience').addEventListener('click',addExperience);$('add-certification').addEventListener('click',addCertification);addExperience();addCertification();
+function invalidateDraft(){app.approved=false;$('share-options').hidden=true;$('resume-output').hidden=true;if(app.shareUrl){URL.revokeObjectURL(app.shareUrl);app.shareUrl=null;}}
+$('resume-form').addEventListener('input',invalidateDraft);$('target-job').addEventListener('change',invalidateDraft);
+function collectEntries(selector,fields){return [...document.querySelectorAll(selector)].map(box=>{const values=[...box.querySelectorAll('input,textarea')];const obj={};fields.forEach((key,i)=>obj[key]=values[i].value.trim());return obj;});}
+function checkStructuredEntries(){const entries=[...document.querySelectorAll('.experience-entry,.certification-entry')];for(const box of entries){for(const field of box.querySelectorAll('[required]')){if(!field.value.trim()){field.setAttribute('aria-invalid','true');field.focus();return 'Complete all required experience and certification fields, or remove an unused entry.';}field.removeAttribute('aria-invalid');}const dates=box.querySelectorAll('input[type="date"]');if(dates.length===2&&dates[1].value&&dates[1].value<dates[0].value){dates[1].setAttribute('aria-invalid','true');dates[1].focus();return 'An end date or expiration date cannot be earlier than its start or issue date.';}}return '';}
+$('resume-form').addEventListener('submit',event=>{event.preventDefault();if(!checkRequired(['applicant-name','education','resume-skills'])){error('Missing information','Enter your name, education, and skills.');return;}const validation=checkStructuredEntries();if(validation){$('resume-error').textContent=validation;error('Unable to generate documents',validation);return;}$('resume-error').textContent='';const job=jobs[Number($('target-job').value)],name=$('applicant-name').value.trim(),education=$('education').value.trim(),skills=$('resume-skills').value.trim(),experiences=collectEntries('.experience-entry',['company','position','start','end','responsibilities']),certs=collectEntries('.certification-entry',['issuer','name','issued','expires']);const expText=experiences.length?experiences.map(e=>`${e.position} — ${e.company}\n${e.start} to ${e.end||'Present'}\nResponsibilities: ${e.responsibilities}`).join('\n\n'):'Not provided';const certText=certs.length?certs.map(c=>`${c.name} — ${c.issuer}\nIssued: ${c.issued} | Expires: ${c.expires||'No expiration listed'}`).join('\n\n'):'Not provided';const matched=job.skills.filter(s=>skills.toLowerCase().split(',').map(x=>x.trim()).includes(s));app.resume=`${name}\n\nTARGET POSITION\n${job.title} — ${job.company}\n\nEDUCATION\n${education}\n\nSKILLS\n${skills}\n\nPAST EXPERIENCE\n${expText}\n\nCERTIFICATIONS\n${certText}\n\nMATCHED JOB SKILLS\n${matched.join(', ')||'None identified'}`;app.letter=`Dear ${job.company} Hiring Team,\n\nMy name is ${name}, and I am interested in the ${job.title} position at ${job.company}. I am especially interested in the role's focus on ${job.focus}.\n\nMy educational background is ${education}. My listed skills include ${skills}.\n\nMy relevant experience includes:\n${expText}\n\n${certs.length?'My certifications include:\n'+certText+'\n\n':''}Thank you for considering my application.\n\nSincerely,\n${name}`;$('resume-text').textContent=app.resume;$('letter-text').textContent=app.letter;$('resume-output').hidden=false;$('approve-documents').hidden=false;$('share-options').hidden=true;app.approved=false;setStatus('resume-status','Drafts generated. Review them before approving.');});
+$('approve-documents').addEventListener('click',()=>{if(!app.resume)return;confirm('Have you reviewed the resume and cover letter and verified that all information is accurate?',()=>{app.approved=true;$('approve-documents').hidden=true;$('share-options').hidden=false;setStatus('resume-status','Documents approved. Choose how to share them.');success('Documents approved!','Your resume and cover letter are ready for the selected sharing method.');});});
+const documentText=()=>`RESUME\n\n${app.resume}\n\n----------------------------\n\nCOVER LETTER\n\n${app.letter}`;
+$('share-link').addEventListener('click',async()=>{if(!app.approved)return;if(app.shareUrl)URL.revokeObjectURL(app.shareUrl);app.shareUrl=URL.createObjectURL(new Blob([documentText()],{type:'text/plain'}));try{await navigator.clipboard.writeText(app.shareUrl);setStatus('share-status','Temporary document link copied. It only works in this browser session and cannot be used as a public sharing link.');success('Temporary link copied!','The link works only in this browser session. It is not a public document-sharing link.');}catch{setStatus('share-status','Clipboard unavailable. Use PDF or Email instead; public link sharing requires a backend.');error('Link unavailable','This browser does not permit copying a temporary link. Use PDF or Email instead.');}});
+$('share-pdf').addEventListener('click',()=>{if(!app.approved)return;const win=window.open('','_blank');if(!win){error('PDF preview blocked','Allow pop-ups for this local preview, then try again.');return;}const escapeHtml=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));win.document.write(`<!doctype html><html><head><title>Approved application documents</title><style>body{font:12pt Arial;max-width:800px;margin:36px auto;line-height:1.5}pre{font:inherit;white-space:pre-wrap;overflow-wrap:anywhere}h1{font-size:18pt}hr{margin:32px 0}@media print{body{margin:12mm}}</style></head><body><h1>Resume</h1><pre>${escapeHtml(app.resume)}</pre><hr><h1>Cover Letter</h1><pre>${escapeHtml(app.letter)}</pre></body></html>`);win.document.close();win.focus();setStatus('share-status','Document opened in a new tab. Choose Print, then Save as PDF.');success('PDF preview ready!','In the new tab, use Print and select Save as PDF.');});
+$('share-email').addEventListener('click',()=>{if(!app.approved)return;const subject=encodeURIComponent('Resume and Cover Letter — '+$('applicant-name').value.trim());const body=encodeURIComponent(documentText());if(body.length>16000){error('Email draft too large','Your documents are too long for a reliable email link. Save as PDF and attach the file manually.');return;}window.location.href=`mailto:?subject=${subject}&body=${body}`;setStatus('share-status','An email draft was requested. Review recipients and content; nothing was sent automatically.');});
+// AGENT 3
+$('connect-calendar').addEventListener('click',()=>{app.calendarConnected=true;setStatus('calendar-status',`${ $('calendar-service').value } connected in simulation mode.`);success('Calendar connected!','Your simulated calendar is ready. No real account was accessed.');});
+const minutes=i=>new Date(`${i.date}T${i.time}:00`).getTime();
+function conflictWith(inv){const start=minutes(inv),end=start+inv.duration*60000;return app.scheduled.find(other=>{const s=minutes(other),e=s+other.duration*60000;return start<e&&end>s;});}
+function renderInvitations(){const list=$('invitation-list');list.replaceChildren();invitations.forEach(inv=>{const job=jobs[inv.job],card=el('article','','card');card.append(el('h3',job.company),el('p',job.title),el('p',`${inv.date} at ${inv.time} (${inv.duration} minutes)`));const already=app.scheduled.some(s=>s.id===inv.id);const button=addButton(card,already?'Scheduled':'Schedule Interview',()=>{if(!app.calendarConnected){error('Calendar not connected','Connect a simulated calendar before scheduling an interview.');return;}const conflicting=conflictWith(inv);if(conflicting){const existing=jobs[conflicting.job];setStatus('calendar-status','Scheduling conflict detected.');error('Scheduling conflict!',`This interview overlaps with your scheduled ${existing.company} interview on ${conflicting.date} at ${conflicting.time}. Choose another invitation.`);return;}confirm(`Schedule the ${job.company} interview on ${inv.date} at ${inv.time}?`,()=>{app.scheduled.push(inv);renderInvitations();renderScheduled();setStatus('calendar-status',`${job.company} interview added to your simulated calendar.`);success('Interview scheduled!',`Your simulated ${job.company} interview is scheduled for ${inv.date} at ${inv.time}.`);});},true);button.disabled=already;list.appendChild(card);});}
+function renderScheduled(){const list=$('scheduled-list'),select=$('followup-company');list.replaceChildren();select.replaceChildren();if(!app.scheduled.length){list.textContent='No interviews scheduled.';select.appendChild(new Option('No scheduled interviews',''));return;}app.scheduled.forEach(inv=>{const job=jobs[inv.job];list.appendChild(el('p',`${job.company} — ${inv.date} at ${inv.time}`));select.appendChild(new Option(`${job.company}: ${job.title}`,inv.id));});}
+$('generate-followup').addEventListener('click',()=>{const inv=app.scheduled.find(i=>i.id===Number($('followup-company').value));if(!inv){error('No scheduled interview','Schedule an interview before preparing a follow-up.');return;}const job=jobs[inv.job],type=$('followup-type').value;if(type==='thanks')app.followup=`Dear ${job.company} Hiring Team,\n\nThank you for discussing the ${job.title} position. I appreciated learning more about the opportunity.\n\nBest regards,\n[Applicant Name]`;else if(type==='status')app.followup=`Dear ${job.company} Hiring Team,\n\nI am following up regarding the ${job.title} position. I remain interested and would appreciate any updates.\n\nBest regards,\n[Applicant Name]`;else app.followup=`Hello,\n\nThank you for discussing the ${job.title} opportunity at ${job.company}. I would be glad to stay connected.`;$('followup-text').textContent=app.followup;$('followup-preview').hidden=false;setStatus('calendar-status','Message ready for review.');});
+$('approve-followup').addEventListener('click',()=>{if(!app.followup)return;confirm('Approve this simulated follow-up message? No real email or LinkedIn request will be sent.',()=>{app.followup='';$('followup-preview').hidden=true;setStatus('calendar-status','Simulated follow-up approved and recorded.');success('Follow-up sent!','The follow-up was recorded as sent in this simulation. No real message was transmitted.');});});renderInvitations();renderScheduled();
+// AGENT 4: user chooses 1–5 questions before beginning.
+function showQuestion(){const q=app.practiceQuestions[app.questionIndex];$('question-progress').textContent=`Question ${app.questionIndex+1} of ${app.practiceQuestions.length}`;$('interview-question').textContent=q.text;$('interview-answer').value='';$('interview-answer').removeAttribute('aria-invalid');$('answer-error').textContent='';$('coaching-feedback').replaceChildren();$('submit-answer').disabled=false;$('next-question').hidden=true;}
+$('start-practice').addEventListener('click',()=>{app.practiceJob=Number($('coach-job').value);const count=Number($('question-count').value);app.practiceQuestions=questionBank[app.practiceJob].slice(0,count);app.questionIndex=0;app.scores=[];$('practice-area').hidden=false;showQuestion();setStatus('coach-status',`Practice started: ${count} question(s).`);});
+$('submit-answer').addEventListener('click',()=>{const answer=$('interview-answer').value.trim();if(!answer){$('interview-answer').setAttribute('aria-invalid','true');$('answer-error').textContent='Enter an answer before requesting feedback.';return;}const q=app.practiceQuestions[app.questionIndex],matched=q.keywords.filter(k=>answer.toLowerCase().includes(k)),score=Math.round(matched.length/q.keywords.length*100);app.scores.push(score);const feedback=$('coaching-feedback');feedback.replaceChildren();feedback.append(el('h4','Coaching Feedback'),el('p',`Keyword coverage: ${score}%`),el('p',`Recognized concepts: ${matched.join(', ')||'None'}`),el('p',`Consider discussing: ${q.keywords.filter(k=>!matched.includes(k)).join(', ')||'None'}`),el('p','This keyword-based estimate does not measure actual interview quality.'));$('submit-answer').disabled=true;$('next-question').hidden=false;$('next-question').textContent=app.questionIndex===app.practiceQuestions.length-1?'Finish Practice':'Next Question';setStatus('coach-status','Feedback is ready.');});
+$('next-question').addEventListener('click',()=>{app.questionIndex++;if(app.questionIndex<app.practiceQuestions.length){showQuestion();setStatus('coach-status',`Question ${app.questionIndex+1} of ${app.practiceQuestions.length}.`);return;}const average=Math.round(app.scores.reduce((a,b)=>a+b,0)/app.scores.length);$('practice-area').hidden=true;setStatus('coach-status',`Practice complete. Average keyword coverage: ${average}%.`);success('Practice completed!',`You completed ${app.practiceQuestions.length} questions. Average keyword coverage: ${average}%.`);});
+// CUSTOMER SERVICE
+$('feedback-form').addEventListener('submit',event=>{event.preventDefault();const required=checkRequired(['feedback-name','feedback-message']),email=checkEmail('feedback-email','feedback-email-error'),message=$('feedback-message').value.trim();if(!required||!email||message.length<10){if(message.length<10)$('feedback-message').setAttribute('aria-invalid','true');error('Feedback could not be recorded','Complete all required fields, enter a valid email, and write at least 10 characters.');return;}confirm('Save this feedback in the current browser session? It will not be sent to a customer service team.',()=>{app.feedback.push({name:$('feedback-name').value.trim(),email:$('feedback-email').value.trim(),category:$('feedback-category').value,message});$('feedback-form').reset();['feedback-name','feedback-email','feedback-message'].forEach(id=>$(id).removeAttribute('aria-invalid'));$('feedback-email-error').textContent='';setStatus('feedback-status','Feedback recorded for this browser session.');success('Feedback received!','Your feedback was recorded in this browser session. It was not transmitted to customer service.');});});
+showTab('home');
